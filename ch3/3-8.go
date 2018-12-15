@@ -6,7 +6,13 @@ import (
 )
 
 func hello(r http.ResponseWriter, w *http.Request) {
+	h := w.Header["Connection"]
+	t := w.Header.Get("Connection")
 	fmt.Fprintf(r, "hello")
+	fmt.Fprintln(r)
+	fmt.Fprintln(r, t)
+	fmt.Fprintln(r)
+	fmt.Fprintln(r, h)
 }
 
 
