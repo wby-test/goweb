@@ -1,9 +1,9 @@
 package main
 
 import (
-	_"github.com/Go-SQL-Driver/MySQL"
 	"database/sql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Post struct {
@@ -15,15 +15,15 @@ type Post struct {
 var Db *sql.DB
 func init() {
 	var err error
-	//Db, err = sql.Open("mysql", "user=root, dbname=goweb,password=070122, sslmode=disable")
-	Db, err = sql.Open("mysql", "root:070122@tcp(127.0.0.1:3306)/goweb?charset=utf8")
+	//Db, err = sql.Open("mysql", "user=wby, dbname=goweb,password=070122")
+	Db, err = sql.Open("mysql", "wby:070122@/goweb")
 	if err != nil {
 		panic(err)
 	}
 }
 
 func Posts(limit int) (posts []Post, err error) {
-	rows, err := Db.Query("select id , content, author from posts limit $1", limit)
+	rows, err := Db.Query("select id , content, author from posts limit ?", limit)
 	if err != nil {
 		return
 	}
@@ -42,31 +42,48 @@ func Posts(limit int) (posts []Post, err error) {
 
 func GetPost(id int) (post Post, err error) {
 	post = Post{}
-	err = Db.QueryRow("select id , content, author from posts where id = $1" ,id).Scan(&post.Id, &post.Content, &post.Author)
-	fmt.Println("getpost: ", post)
+	err = Db.QueryRow("select id, content, author from posts where id = ?", id).Scan(&post.Id, &post.Content, &post.Author)
+	if err != nil {
+		fmt.Println("getPost:...",err)
+	}
 	return
+}
+func (post *Post)GetId(){
+	err := Db.QueryRow("select id from posts where content=? and author=?", post.Content, post.Author).Scan(&post.Id)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (post *Post) Create() (err error) {
-	statement := "insert into posts (content, author) values ($1, $2) returning id"
+	statement := "insert into posts (content, author) values (?, ?)"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
+		panic(err)
 		return
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(post.Content, post.Author).Scan(&post.Id)
+
+	err = stmt.QueryRow(post.Content, post.Author).Scan(post.Content)
+	if err != nil {
+//		panic(err)
+		return
+	}
 	return
 }
 
+
 func (post *Post)Update() (err error) {
-	fmt.Println("update: ",post)
-	_, err = Db.Exec("update posts set content = $2, author = $3 where id = $1",
-		post.Id, post.Content, post.Author)
+	_, err = Db.Exec("update posts set content = ?, author = ? where id = ? ",
+		 post.Content, post.Author,post.Id)
+	if err != nil {
+		panic(err)
+	}
 	return
 }
 
 func (post *Post) Delete() (err error) {
-	_, err = Db.Exec("delete from posts where id = $1", post.Id)
+	_, err = Db.Exec("delete from posts where id = ?", post.Id)
 	return
 }
 
@@ -74,23 +91,21 @@ func main() {
 	post := Post{Content:"golang", Author:"wby"}
 
 	fmt.Println(post)
-	post.Create()
-	fmt.Println(post)
+	//post.Create()
+	post.GetId()
 
 	readPost, _ := GetPost(post.Id)
 	fmt.Println(readPost)
 
 	readPost.Content = "php"
 	readPost.Author = "wyr"
+	fmt.Println(readPost)
 	readPost.Update()
 
-	posts, _ := Posts(post.Id)
+	posts, _ := Posts(10)
 	fmt.Println(posts)
 
-	post1,_ := GetPost(101)
-	fmt.Println(post1.Id)
-	a,_ := GetPost(101);
-	fmt.Println(a.Author)
+	post.Delete()
 
-	//readPost.Delete()
+	//Db.Exec("delete from posts")
 }
