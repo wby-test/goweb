@@ -12,18 +12,10 @@ func (h *MyHandle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	/*
-	server := http.Server{
-		Addr: "127.0.0.1:8080",
-		Handler: nil,
-	}
-
-	server.ListenAndServe()
-	*/
 	handler := MyHandle{}
 	server := http.Server{
-		Addr:"127.0.0.1:12345",
-		Handler:&handler,
+		Addr: "127.0.0.1:8080",
+		Handler: &handler,
 	}
 
 	server.ListenAndServe()
