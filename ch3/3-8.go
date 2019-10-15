@@ -1,8 +1,8 @@
-package main 
+package main
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 )
 
 func hello(r http.ResponseWriter, w *http.Request) {
@@ -31,3 +31,4 @@ func main() {
 
 	server.ListenAndServe()
 }
+
