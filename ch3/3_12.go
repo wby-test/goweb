@@ -6,8 +6,10 @@ import (
 	"net/http"
 )
 
+
+//权限密码验证
 func helloMutex(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	fmt.Fprintf(w, "hello, %s %s\n", p.ByName("name"), p.ByName("haha"))
+	fmt.Fprintf(w, "hello, %s %s\n", p.ByName("name"), p.ByName("password"))
 }
 
 func main() {
