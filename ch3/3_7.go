@@ -5,6 +5,9 @@ import (
 	"net/http"
 )
 
+//将一个handle注册进入server中，
+//1、在结构体中直接定义
+//2、使用Handle函数
 type jsdHandler struct {}
 
 type jsdtHandler struct {}

@@ -1,9 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"net/http"
-)
+import juu   a
 
 func process(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "(1)", r.FormValue("hello"))
